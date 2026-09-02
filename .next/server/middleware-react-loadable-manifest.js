@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"components/PuzzleBoard.tsx -> ./MapView\":{\"id\":\"components/PuzzleBoard.tsx -> ./MapView\",\"files\":[\"static/chunks/_app-pages-browser_src_components_MapView_tsx.js\"]}}"
