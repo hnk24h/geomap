@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Province {
+  id        Int        @id @default(autoincrement())
+  countryId Int?
+  slug      String
+  name      String
+  subtitle  String
+  fact      String
+  lat       Float
+  lng       Float
+  color     String
+  geometry  Json?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  country   Country?   @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  districts District[]
+
+  @@index([countryId])
+  @@unique([countryId, slug])
+}
+
+model District {
+  id         Int      @id @default(autoincrement())
+  provinceId Int
+  slug       String
+  name       String
+  subtitle   String
+  fact       String
+  lat        Float
+  lng        Float
+  color      String
+  levelType  LocalAreaType @default(DISTRICT)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  province Province @relation(fields: [provinceId], references: [id], onDelete: Cascade)
+
+  @@index([provinceId])
+  @@unique([provinceId, slug])
+}
+
+model Country {
+  id        Int        @id @default(autoincrement())
+  slug      String     @unique
+  name      String
+  subtitle  String
+  fact      String
+  lat       Float
+  lng       Float
+  color     String
+  unlockBatchSize Int  @default(10)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  provinces Province[]
+}
+
+enum LocalAreaType {
+  DISTRICT
+  WARD
+  CITY
+}

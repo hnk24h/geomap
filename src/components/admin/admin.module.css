@@ -1,0 +1,157 @@
+.page {
+  min-height: 100vh;
+  padding: 24px;
+  background: linear-gradient(180deg, #f6fbfa 0%, #eef6f3 100%);
+  color: #183f4a;
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.header p {
+  margin: 8px 0 0;
+  color: #4f6d75;
+}
+
+.back {
+  text-decoration: none;
+  color: #1d5763;
+  font-weight: 700;
+  border: 1px solid #d2e3de;
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: #ffffff;
+}
+
+.levelGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #d6e6e2;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.card h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.form label {
+  font-size: 12px;
+  color: #40636c;
+  display: block;
+}
+
+.form input,
+.form textarea,
+.form select {
+  width: 100%;
+  border: 1px solid #c6dbd5;
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 6px;
+}
+
+.span2 {
+  grid-column: span 2;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.primary {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #ea7d62;
+  color: #fff;
+  font-weight: 700;
+}
+
+.primary:disabled {
+  opacity: 0.5;
+}
+
+.list {
+  margin-top: 14px;
+  max-height: 420px;
+  overflow: auto;
+  border: 1px solid #e0ece8;
+  border-radius: 10px;
+}
+
+.item {
+  padding: 10px 12px;
+  border-top: 1px solid #edf3f1;
+}
+
+.item:first-child {
+  border-top: 0;
+}
+
+.itemTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.item p {
+  margin: 6px 0 0;
+  color: #4f6e75;
+  font-size: 13px;
+}
+
+.smallBtn {
+  border: 0;
+  border-radius: 8px;
+  padding: 6px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e6f1ee;
+  color: #1f5662;
+}
+
+.danger {
+  background: #f9e3de;
+  color: #9a3d2a;
+}
+
+.note {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #375c65;
+}
+
+@media (max-width: 1200px) {
+  .levelGrid {
+    grid-template-columns: 1fr;
+  }
+}

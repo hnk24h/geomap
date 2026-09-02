@@ -16,6 +16,6 @@ function toPath(feature: Feature) {
 
 export default function ProvincePieceShape({ slug, color }: { slug: string; color: string }) {
   const [path, setPath] = useState<string | null>(null)
-  useEffect(() => { fetch('/data/vietnam-provinces.geojson').then(r => r.json()).then(data => { const expected = aliases[slug] || normalize(slug); const feature = data.features.find((item: Feature) => normalize(item.properties.Name || '') === expected); if (feature) setPath(toPath(feature)) }).catch(() => undefined) }, [slug])
+  useEffect(() => { fetch('/api/geo/countries/vietnam/provinces').then(r => r.json()).then(data => { const expected = normalize(slug); const alias = aliases[slug] || ''; const feature = data.features.find((item: Feature & { properties?: { slug?: string; Name?: string } }) => item.properties?.slug === slug || normalize(item.properties?.Name || '') === expected || normalize(item.properties?.Name || '') === alias); if (feature) setPath(toPath(feature)) }).catch(() => undefined) }, [slug])
   return <svg viewBox="0 0 100 100" className="province-piece-shape" aria-hidden="true">{path ? <path d={path} fill={color} stroke="#fffefa" strokeWidth="3" strokeLinejoin="round"/> : <path d="M22 12L77 20 86 57 61 88 19 74 11 40Z" fill={color}/>}</svg>
 }

@@ -1,4 +1,5 @@
 export type GeoPlace = { slug: string; name: string; subtitle: string; fact: string; lat: number; lng: number; color: string }
+export type GeoSubdivision = { slug: string; coordinates: [number, number][] }
 
 export const vietnamProvinces: GeoPlace[] = [
   { slug: 'ha-giang', name: 'Hà Giang', subtitle: 'Northeast', fact: 'Vietnam’s northernmost province, famed for its limestone mountains.', lat: 22.82, lng: 104.98, color: '#F2B950' },
@@ -22,4 +23,75 @@ export const genericDistricts: GeoPlace[] = [
   { slug: 'north', name: 'Northern district', subtitle: 'District level', fact: 'One of the local areas to discover.', lat: 0.06, lng: 0, color: '#F2B950' },
   { slug: 'central', name: 'Central district', subtitle: 'District level', fact: 'At the heart of this province.', lat: 0, lng: 0.05, color: '#83C7B8' },
   { slug: 'south', name: 'Southern district', subtitle: 'District level', fact: 'A local district waiting to be placed.', lat: -0.06, lng: 0, color: '#ED8068' },
+]
+
+export const districtBoundarySamples: Record<string, GeoSubdivision[]> = {
+  'quang-tri': [
+    {
+      slug: 'dong-ha',
+      coordinates: [
+        [16.86, 107.05],
+        [16.86, 107.16],
+        [16.79, 107.17],
+        [16.77, 107.08],
+      ],
+    },
+    {
+      slug: 'cam-lo',
+      coordinates: [
+        [16.86, 106.93],
+        [16.86, 107.06],
+        [16.77, 107.08],
+        [16.73, 106.96],
+      ],
+    },
+    {
+      slug: 'trieu-phong',
+      coordinates: [
+        [16.79, 107.11],
+        [16.79, 107.25],
+        [16.71, 107.27],
+        [16.70, 107.14],
+      ],
+    },
+    {
+      slug: 'hai-lang',
+      coordinates: [
+        [16.70, 107.08],
+        [16.71, 107.27],
+        [16.63, 107.30],
+        [16.62, 107.12],
+      ],
+    },
+  ],
+}
+
+export const buildGenericDistrictBoundaries = (provinceLat: number, provinceLng: number): GeoSubdivision[] => [
+  {
+    slug: 'north',
+    coordinates: [
+      [provinceLat + 0.14, provinceLng - 0.18],
+      [provinceLat + 0.14, provinceLng + 0.18],
+      [provinceLat + 0.03, provinceLng + 0.2],
+      [provinceLat + 0.02, provinceLng - 0.2],
+    ],
+  },
+  {
+    slug: 'central',
+    coordinates: [
+      [provinceLat + 0.03, provinceLng - 0.2],
+      [provinceLat + 0.03, provinceLng + 0.2],
+      [provinceLat - 0.06, provinceLng + 0.2],
+      [provinceLat - 0.06, provinceLng - 0.2],
+    ],
+  },
+  {
+    slug: 'south',
+    coordinates: [
+      [provinceLat - 0.06, provinceLng - 0.2],
+      [provinceLat - 0.06, provinceLng + 0.2],
+      [provinceLat - 0.16, provinceLng + 0.18],
+      [provinceLat - 0.16, provinceLng - 0.18],
+    ],
+  },
 ]

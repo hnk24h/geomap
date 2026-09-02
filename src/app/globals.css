@@ -11,3 +11,9 @@
 .leaflet-interactive.magnetic-province{filter:drop-shadow(0 0 8px rgba(239,131,96,.95));animation:province-snap-target .7s ease-in-out infinite alternate}.leaflet-interactive.placed-province{filter:drop-shadow(0 3px 2px rgba(35,75,79,.3))}.drop-prompt.magnetic{background:#e9795e;box-shadow:0 0 0 5px rgba(233,121,94,.22);animation:prompt-pop .3s ease-out}@keyframes province-snap-target{to{stroke-width:6;filter:drop-shadow(0 0 16px rgba(239,131,96,1))}}@keyframes prompt-pop{from{transform:translateX(-50%) scale(.8);opacity:.2}}
 .puzzle-layout{max-width:1480px;grid-template-columns:128px minmax(720px,1fr) 165px;gap:14px;padding:14px 2.5vw;height:calc(100vh - 196px);min-height:540px}.piece-tray{height:124px;padding:11px 3vw}.map-frame{border-radius:26px}.level-brief{padding-top:18px}.map-info{padding-top:12px}@media(max-width:800px){.puzzle-layout{grid-template-columns:1fr;height:calc(100vh - 230px);min-height:400px;padding:12px}.piece-tray{height:157px;padding:11px}}
 .drag-piece-ghost{position:fixed;left:-200px;top:-200px;width:96px;height:96px;display:grid;place-items:center;filter:drop-shadow(0 12px 9px rgba(32,67,73,.4));transform:rotate(3deg) scale(1.08);pointer-events:none}.drag-piece-ghost svg{overflow:visible}
+
+.world-admin-link{display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 12px;border-radius:999px;text-decoration:none;background:#e7f2ee;color:#265662;font-weight:700;letter-spacing:.02em}
+
+.leaflet-interactive.focused-province{filter:drop-shadow(0 8px 18px rgba(30,74,84,.35))}
+.leaflet-interactive.non-focused-province{transition:fill-opacity .2s ease,opacity .2s ease}
+.leaflet-interactive.district-divider{stroke-linejoin:round;stroke-linecap:round;filter:drop-shadow(0 1px 1px rgba(16,41,48,.35))}
