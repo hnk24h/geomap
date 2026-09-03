@@ -35,6 +35,27 @@ const aliases: Record<string, string> = {
   'da-nang': 'danangcity',
 }
 
+let provinceGeoJsonCache: FeatureCollection | null = null
+let provinceGeoJsonRequest: Promise<FeatureCollection> | null = null
+
+const loadProvinceGeoJson = () => {
+  if (provinceGeoJsonCache) return Promise.resolve(provinceGeoJsonCache)
+
+  if (!provinceGeoJsonRequest) {
+    provinceGeoJsonRequest = fetch('/api/geo/countries/vietnam/provinces')
+      .then((response) => response.json() as Promise<FeatureCollection>)
+      .then((data) => {
+        provinceGeoJsonCache = data
+        return data
+      })
+      .finally(() => {
+        provinceGeoJsonRequest = null
+      })
+  }
+
+  return provinceGeoJsonRequest
+}
+
 /** Uses Leaflet directly so React Strict Mode can reliably destroy its map instance. */
 export default function MapView({
   center,
@@ -58,8 +79,39 @@ export default function MapView({
   const subdivisionsLayerRef = useRef<L.FeatureGroup | null>(null)
   const tileLayerRef = useRef<L.TileLayer | null>(null)
   const autoFocusedProvinceRef = useRef<string | null>(null)
-  const provinceGeoJsonRef = useRef<FeatureCollection | null>(null)
-  const provinceGeoJsonRequestRef = useRef<Promise<FeatureCollection> | null>(null)
+  const onPlaceRef = useRef(onPlace)
+  const gameplayStateRef = useRef({ places, placed, selected, draggingSlug, isCorrectDropTarget, isNearDropTarget, focusView, focusSlug })
+
+  onPlaceRef.current = onPlace
+  gameplayStateRef.current = { places, placed, selected, draggingSlug, isCorrectDropTarget, isNearDropTarget, focusView, focusSlug }
+
+  const provinceStyle = (feature?: GeoJSON.Feature) => {
+    const state = gameplayStateRef.current
+    const featureSlug = String(feature?.properties?.slug || '')
+    const name = normalize(String(feature?.properties?.Name || ''))
+    const place = state.places.find((item) => item.slug === featureSlug || (aliases[item.slug] || normalize(item.slug)) === name)
+    const isPlaced = Boolean(place && state.placed.includes(place.slug))
+    const isMagneticTarget = Boolean(place && place.slug === state.draggingSlug && state.isCorrectDropTarget)
+    const isNearTarget = Boolean(place && place.slug === state.draggingSlug && state.isNearDropTarget && !state.isCorrectDropTarget)
+    const isHintTarget = Boolean(place && place.slug === state.selected)
+    const focusedSlug = state.focusSlug ? normalize(aliases[state.focusSlug] || state.focusSlug) : null
+    const isFocused = Boolean(focusedSlug && name === focusedSlug)
+
+    if (focusedSlug) {
+      return isFocused
+        ? { color: '#214b58', weight: state.focusView ? 3.2 : 2.6, fillColor: place?.color || '#9dcfc2', fillOpacity: state.focusView ? 0.82 : 0.36, className: 'focused-province' }
+        : { color: '#7f9e9b', weight: 0.9, fillColor: '#d6e5e0', fillOpacity: state.focusView ? 0.03 : 0.1, className: 'non-focused-province' }
+    }
+
+    return {
+      color: isPlaced || isMagneticTarget || isNearTarget || isHintTarget ? place!.color : state.focusView ? '#355e62' : '#548078',
+      weight: isMagneticTarget ? 4.6 : isNearTarget ? 3.8 : isHintTarget ? 3.2 : isPlaced ? 3.4 : state.focusView ? 1.8 : 1.1,
+      fillColor: isPlaced || isMagneticTarget || isNearTarget || isHintTarget ? place!.color : state.focusView ? '#b7cbc4' : '#b6c9c2',
+      fillOpacity: isPlaced ? 0.88 : isMagneticTarget ? 0.68 : isNearTarget ? 0.28 : isHintTarget ? 0.48 : state.focusView ? 0.96 : 0.16,
+      dashArray: isNearTarget ? '8 5' : undefined,
+      className: isMagneticTarget ? 'magnetic-province' : isNearTarget ? 'near-target-province' : isHintTarget ? 'hint-province' : isPlaced ? 'placed-province' : '',
+    }
+  }
 
   useEffect(() => {
     const container = containerRef.current
@@ -107,63 +159,7 @@ export default function MapView({
         let focusedBounds: L.LatLngBounds | null = null
 
         provinceLayerRef.current = L.geoJSON(data as GeoJsonObject, {
-          style: (feature) => {
-            const featureSlug = String(feature?.properties?.slug || '')
-            const name = normalize(String(feature?.properties?.Name || ''))
-            const place = places.find((item) => item.slug === featureSlug || (aliases[item.slug] || normalize(item.slug)) === name)
-            const isPlaced = Boolean(place && placed.includes(place.slug))
-            const isMagneticTarget = Boolean(place && place.slug === draggingSlug && isCorrectDropTarget)
-            const isNearTarget = Boolean(place && place.slug === draggingSlug && isNearDropTarget && !isCorrectDropTarget)
-            const isHintTarget = Boolean(place && place.slug === selected)
-            const isFocused = Boolean(focusedSlug && name === focusedSlug)
-
-            if (focusedSlug) {
-              if (isFocused) {
-                return {
-                  color: '#214b58',
-                  weight: focusView ? 3.2 : 2.6,
-                  fillColor: place?.color || '#9dcfc2',
-                  fillOpacity: focusView ? 0.82 : 0.36,
-                  className: 'focused-province',
-                }
-              }
-
-              return {
-                color: '#7f9e9b',
-                weight: 0.9,
-                fillColor: '#d6e5e0',
-                fillOpacity: focusView ? 0.03 : 0.1,
-                className: 'non-focused-province',
-              }
-            }
-
-            return {
-              color:
-                isPlaced || isMagneticTarget || isNearTarget || isHintTarget
-                  ? place!.color
-                  : focusView
-                    ? '#355e62'
-                    : '#548078',
-              weight: isMagneticTarget ? 4.6 : isNearTarget ? 3.8 : isHintTarget ? 3.2 : isPlaced ? 3.4 : focusView ? 1.8 : 1.1,
-              fillColor:
-                isPlaced || isMagneticTarget || isNearTarget || isHintTarget
-                  ? place!.color
-                  : focusView
-                    ? '#b7cbc4'
-                    : '#b6c9c2',
-              fillOpacity: isPlaced ? 0.88 : isMagneticTarget ? 0.68 : isNearTarget ? 0.28 : isHintTarget ? 0.48 : focusView ? 0.96 : 0.16,
-              dashArray: isNearTarget ? '8 5' : undefined,
-              className: isMagneticTarget
-                ? 'magnetic-province'
-                : isNearTarget
-                  ? 'near-target-province'
-                : isHintTarget
-                  ? 'hint-province'
-                  : isPlaced
-                    ? 'placed-province'
-                    : '',
-            }
-          },
+          style: provinceStyle,
           onEachFeature: (feature, layer) => {
             const featureSlug = String(feature?.properties?.slug || '')
             const name = normalize(String(feature.properties?.Name || ''))
@@ -173,9 +169,12 @@ export default function MapView({
               focusedBounds = (layer as L.Polygon).getBounds()
             }
 
-            if (place) {
-              layer.on('click', () => onPlace?.(place.slug))
-            }
+            layer.on('click', () => {
+              const currentPlace = gameplayStateRef.current.places.find(
+                (item) => item.slug === featureSlug || (aliases[item.slug] || normalize(item.slug)) === name,
+              )
+              if (currentPlace) onPlaceRef.current?.(currentPlace.slug)
+            })
           },
         }).addTo(map)
 
@@ -214,28 +213,10 @@ export default function MapView({
         }
     }
 
-    const loadGeoJson = async () => {
-      if (provinceGeoJsonRef.current) return provinceGeoJsonRef.current
-
-      if (!provinceGeoJsonRequestRef.current) {
-        provinceGeoJsonRequestRef.current = fetch('/api/geo/countries/vietnam/provinces')
-          .then((response) => response.json() as Promise<FeatureCollection>)
-          .then((data) => {
-            provinceGeoJsonRef.current = data
-            return data
-          })
-          .finally(() => {
-            provinceGeoJsonRequestRef.current = null
-          })
-      }
-
-      return provinceGeoJsonRequestRef.current
-    }
-
-    if (provinceGeoJsonRef.current) {
-      drawLayers(provinceGeoJsonRef.current)
+    if (provinceGeoJsonCache) {
+      drawLayers(provinceGeoJsonCache)
     } else {
-      void loadGeoJson()
+      void loadProvinceGeoJson()
         .then((data) => drawLayers(data))
         .catch(() => undefined)
     }
@@ -246,18 +227,12 @@ export default function MapView({
       subdivisionsLayerRef.current?.remove()
       subdivisionsLayerRef.current = null
     }
-  }, [
-    focusView,
-    places,
-    placed,
-    selected,
-    draggingSlug,
-    isCorrectDropTarget,
-    isNearDropTarget,
-    onPlace,
-    focusSlug,
-    subdivisions,
-  ])
+  }, [])
+
+  useEffect(() => {
+    tileLayerRef.current?.setOpacity(focusView ? 0.16 : 1)
+    provinceLayerRef.current?.setStyle(provinceStyle)
+  })
 
   useEffect(() => {
     const container = containerRef.current

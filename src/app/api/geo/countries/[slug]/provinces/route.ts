@@ -33,5 +33,9 @@ export async function GET(_: Request, context: { params: Promise<{ slug: string 
       })),
   }
 
-  return NextResponse.json(featureCollection)
+  return NextResponse.json(featureCollection, {
+    headers: {
+      'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
+    },
+  })
 }

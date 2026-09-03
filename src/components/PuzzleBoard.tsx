@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, Eye, EyeOff, Lightbulb, MapPin, RotateCcw, Sparkles, Star } from 'lucide-react'
+import { ArrowLeft, Check, Crosshair, Eye, EyeOff, Lightbulb, LockKeyhole, MapPin, RotateCcw, Sparkles, Star, Trophy } from 'lucide-react'
 import type { GeoPlace, GeoSubdivision } from '../lib/geo'
 import ProvincePieceShape from './ProvincePieceShape'
 
@@ -67,6 +67,8 @@ export default function PuzzleBoard({
   const stagePieces = loadedPieces.slice(stageStart, unlockedCount)
   const stagePlacedCount = stagePieces.filter((piece) => placed.includes(piece.slug)).length
   const currentStage = Math.floor(Math.max(unlockedCount - 1, 0) / safeBatchSize) + 1
+  const missionCount = Math.ceil(totalPieceCount / safeBatchSize)
+  const completedMissionCount = Math.floor(placed.length / safeBatchSize)
 
   useEffect(() => {
     setLoadedPieces(pieces)
@@ -241,26 +243,56 @@ export default function PuzzleBoard({
       </header>
 
       <section className="puzzle-layout">
-        <aside className="level-brief">
-          <div className="brief-icon">
-            <MapPin size={20} />
+        <aside className="game-hud" aria-label="Game progress">
+          <div className="hud-missions">
+            <div className="hud-missions-title">
+              <Trophy size={15} />
+              <span>MISSIONS</span>
+              <b>{completedMissionCount}/{missionCount}</b>
+            </div>
+
+            <ol className="mission-list">
+              {Array.from({ length: missionCount }, (_, index) => {
+                const mission = index + 1
+                const isCompleted = mission <= completedMissionCount
+                const isActive = !isCompleted && mission === currentStage
+                const isLocked = !isCompleted && !isActive
+                const missionEnd = Math.min(mission * safeBatchSize, totalPieceCount)
+                const missionStart = (mission - 1) * safeBatchSize + 1
+
+                return (
+                  <li key={mission} className={isCompleted ? 'is-completed' : isActive ? 'is-active' : 'is-locked'}>
+                    <span className="mission-state">
+                      {isCompleted ? <Check size={13} /> : isLocked ? <LockKeyhole size={12} /> : <Crosshair size={13} />}
+                    </span>
+                    <span className="mission-copy">
+                      <b>Mission {String(mission).padStart(2, '0')}</b>
+                      <small>{missionStart}-{missionEnd} regions</small>
+                    </span>
+                  </li>
+                )
+              })}
+            </ol>
           </div>
-          <span>PUZZLE LEVEL</span>
-          <h2>{subtitle}</h2>
-          <p>Drag each real place into its home on the map.</p>
-          {!provinceMode && (
-            <p>
-              Stage {currentStage} · Showing {unlockedCount}/{totalPieceCount} provinces
-            </p>
-          )}
-          <div className="level-progress">
-            <b>
-              {placed.length} / {totalPieceCount}
-            </b>
-            <small> places placed</small>
-            <div>
+
+          <div className="hud-progress">
+            <div className="hud-progress-label">
+              <span>MAP PROGRESS</span>
+              <b>{Math.round((placed.length / totalPieceCount) * 100)}%</b>
+            </div>
+            <div className="hud-progress-track">
               <i style={{ width: `${(placed.length / totalPieceCount) * 100}%` }} />
             </div>
+            <small>{placed.length} / {totalPieceCount} placed</small>
+          </div>
+
+          <div className="hud-mission">
+            <span className="hud-mission-icon">
+              <Crosshair size={16} />
+            </span>
+            <span>CURRENT MISSION</span>
+            <b>{isComplete ? 'Stage clear' : selectedPlace?.name || 'Loading...'}</b>
+            {!provinceMode && <small>{unlockedCount} regions unlocked</small>}
           </div>
         </aside>
 
