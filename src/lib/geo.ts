@@ -1,4 +1,15 @@
-export type GeoPlace = { slug: string; name: string; subtitle: string; fact: string; lat: number; lng: number; color: string }
+export type GeoPlace = {
+  slug: string
+  name: string
+  subtitle: string
+  fact: string
+  lat: number
+  lng: number
+  color: string
+  coverImageUrl?: string | null
+  attractions?: string[]
+  notablePeople?: string[]
+}
 export type GeoSubdivision = { slug: string; coordinates: [number, number][] }
 
 export const vietnamProvinces: GeoPlace[] = [

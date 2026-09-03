@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, Check, Crosshair, Eye, EyeOff, Lightbulb, LockKeyhole, MapPin, RotateCcw, Sparkles, Star, Trophy } from 'lucide-react'
+import { ArrowLeft, Check, Crosshair, Eye, EyeOff, Landmark, Lightbulb, LockKeyhole, MapPin, RotateCcw, Sparkles, Star, Trophy, UsersRound } from 'lucide-react'
 import type { GeoPlace, GeoSubdivision } from '../lib/geo'
 import ProvincePieceShape from './ProvincePieceShape'
 
@@ -21,6 +21,7 @@ type PuzzleBoardProps = {
   batchSize?: number
   totalPieces?: number
   loadMorePath?: string
+  regionContext?: GeoPlace
   parentHref: string
   provinceMode?: boolean
   focusSlug?: string
@@ -36,6 +37,7 @@ export default function PuzzleBoard({
   batchSize = 10,
   totalPieces,
   loadMorePath,
+  regionContext,
   parentHref,
   provinceMode = false,
   focusSlug,
@@ -69,6 +71,8 @@ export default function PuzzleBoard({
   const currentStage = Math.floor(Math.max(unlockedCount - 1, 0) / safeBatchSize) + 1
   const missionCount = Math.ceil(totalPieceCount / safeBatchSize)
   const completedMissionCount = Math.floor(placed.length / safeBatchSize)
+  const hasPlaceDetails = Boolean(selectedPlace?.coverImageUrl || selectedPlace?.attractions?.length || selectedPlace?.notablePeople?.length)
+  const explorePlace = provinceMode && !hasPlaceDetails ? regionContext || selectedPlace : selectedPlace
 
   useEffect(() => {
     setLoadedPieces(pieces)
@@ -354,22 +358,40 @@ export default function PuzzleBoard({
         </div>
 
         <aside className="map-info">
-          <div className="data-card">
-            <span>EXPLORE AS YOU PLAY</span>
-            <h3>{selectedPlace?.name || 'Loading...'}</h3>
-            <p>{selectedPlace?.fact || 'Pick a place to see details.'}</p>
-            {provinceMode ? (
-              <button className="detail-link">Ward details coming next</button>
-            ) : (
+          <section className="place-guide">
+            <div className="place-guide-image" style={explorePlace?.coverImageUrl ? { backgroundImage: `url(${explorePlace.coverImageUrl})` } : undefined}>
+              <span>{explorePlace?.coverImageUrl ? 'LOCAL HIGHLIGHT' : 'EXPLORE'}</span>
+            </div>
+            <div className="place-guide-title">
+              <span>{provinceMode && explorePlace?.slug === regionContext?.slug ? 'PROVINCE GUIDE' : 'PLACE GUIDE'}</span>
+              <h3>{explorePlace?.name || 'Loading...'}</h3>
+              <p>{explorePlace?.fact || 'Pick a place to see details.'}</p>
+            </div>
+
+            <div className="place-guide-section">
+              <span><Landmark size={13} /> PLACES TO VISIT</span>
+              {explorePlace?.attractions?.length ? (
+                <ul>{explorePlace.attractions.slice(0, 3).map((attraction) => <li key={attraction}>{attraction}</li>)}</ul>
+              ) : (
+                <p className="place-guide-empty">Details coming soon.</p>
+              )}
+            </div>
+
+            <div className="place-guide-section">
+              <span><UsersRound size={13} /> NOTABLE PEOPLE</span>
+              {explorePlace?.notablePeople?.length ? (
+                <ul>{explorePlace.notablePeople.slice(0, 3).map((person) => <li key={person}>{person}</li>)}</ul>
+              ) : (
+                <p className="place-guide-empty">Details coming soon.</p>
+              )}
+            </div>
+
+            {!provinceMode && (
               <Link className="detail-link" href={`/country/vietnam/province/${selectedPlace?.slug || ''}`}>
                 Open province map →
               </Link>
             )}
-          </div>
-          <div className="how-card">
-            <Sparkles size={17} />
-            <p>Drag the actual map-shaped piece into its true location.</p>
-          </div>
+          </section>
         </aside>
       </section>
 

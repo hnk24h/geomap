@@ -31,6 +31,9 @@ export default async function VietnamPage() {
 				lat: province.lat,
 				lng: province.lng,
 				color: province.color,
+				coverImageUrl: province.coverImageUrl,
+				attractions: province.attractions,
+				notablePeople: province.notablePeople,
 			}))
 		: vietnamProvinces
 

@@ -11,6 +11,9 @@ const parseFloatField = (value: unknown) => {
   return Number.isFinite(numeric) ? numeric : null
 }
 
+const parseStringList = (value: unknown) =>
+  Array.isArray(value) ? value.map(String).map((item) => item.trim()).filter(Boolean) : []
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const provinceIdParam = searchParams.get('provinceId')
@@ -54,6 +57,9 @@ export async function POST(request: Request) {
         fact: String(body.fact),
         color: String(body.color),
         levelType,
+        coverImageUrl: body.coverImageUrl ? String(body.coverImageUrl) : null,
+        attractions: parseStringList(body.attractions),
+        notablePeople: parseStringList(body.notablePeople),
         lat,
         lng,
       },

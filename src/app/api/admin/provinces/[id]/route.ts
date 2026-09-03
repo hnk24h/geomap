@@ -6,6 +6,9 @@ const parseFloatField = (value: unknown) => {
   return Number.isFinite(numeric) ? numeric : null
 }
 
+const parseStringList = (value: unknown) =>
+  Array.isArray(value) ? value.map(String).map((item) => item.trim()).filter(Boolean) : []
+
 export async function PATCH(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params
@@ -22,6 +25,9 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
       subtitle?: string
       fact?: string
       color?: string
+      coverImageUrl?: string | null
+      attractions?: string[]
+      notablePeople?: string[]
       lat?: number
       lng?: number
     } = {}
@@ -37,6 +43,9 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     if (body.subtitle !== undefined) data.subtitle = String(body.subtitle)
     if (body.fact !== undefined) data.fact = String(body.fact)
     if (body.color !== undefined) data.color = String(body.color)
+    if (body.coverImageUrl !== undefined) data.coverImageUrl = body.coverImageUrl ? String(body.coverImageUrl) : null
+    if (body.attractions !== undefined) data.attractions = parseStringList(body.attractions)
+    if (body.notablePeople !== undefined) data.notablePeople = parseStringList(body.notablePeople)
 
     if (body.lat !== undefined) {
       const lat = parseFloatField(body.lat)

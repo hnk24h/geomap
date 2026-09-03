@@ -18,6 +18,9 @@ model Province {
   lng       Float
   color     String
   geometry  Json?
+  coverImageUrl String?
+  attractions   String[] @default([])
+  notablePeople String[] @default([])
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   country   Country?   @relation(fields: [countryId], references: [id], onDelete: Cascade)
@@ -38,6 +41,9 @@ model District {
   lng        Float
   color      String
   levelType  LocalAreaType @default(DISTRICT)
+  coverImageUrl String?
+  attractions   String[] @default([])
+  notablePeople String[] @default([])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

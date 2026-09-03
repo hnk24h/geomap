@@ -27,6 +27,9 @@ type Province = {
   lat: number
   lng: number
   color: string
+  coverImageUrl?: string | null
+  attractions?: string[]
+  notablePeople?: string[]
   _count?: { districts: number }
 }
 
@@ -43,6 +46,9 @@ type LocalUnit = {
   lng: number
   color: string
   levelType: LocalUnitType
+  coverImageUrl?: string | null
+  attractions?: string[]
+  notablePeople?: string[]
 }
 
 const emptyCountry = {
@@ -64,6 +70,9 @@ const emptyProvince = {
   lat: '',
   lng: '',
   color: '#72B8D5',
+  coverImageUrl: '',
+  attractions: '',
+  notablePeople: '',
 }
 
 const emptyLocalUnit = {
@@ -75,6 +84,9 @@ const emptyLocalUnit = {
   lng: '',
   color: '#83C7B8',
   levelType: 'DISTRICT' as LocalUnitType,
+  coverImageUrl: '',
+  attractions: '',
+  notablePeople: '',
 }
 
 export default function AdminCms() {
@@ -187,7 +199,12 @@ export default function AdminCms() {
     const response = await fetch('/api/admin/provinces', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...provinceForm, countryId: selectedCountryId }),
+      body: JSON.stringify({
+        ...provinceForm,
+        countryId: selectedCountryId,
+        attractions: provinceForm.attractions.split('\n'),
+        notablePeople: provinceForm.notablePeople.split('\n'),
+      }),
     })
 
     if (!response.ok) {
@@ -211,7 +228,12 @@ export default function AdminCms() {
     const response = await fetch('/api/admin/districts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...localUnitForm, provinceId: selectedProvinceId }),
+      body: JSON.stringify({
+        ...localUnitForm,
+        provinceId: selectedProvinceId,
+        attractions: localUnitForm.attractions.split('\n'),
+        notablePeople: localUnitForm.notablePeople.split('\n'),
+      }),
     })
 
     if (!response.ok) {
@@ -441,8 +463,20 @@ export default function AdminCms() {
                 <input required value={provinceForm.lng} onChange={(event) => setProvinceForm((state) => ({ ...state, lng: event.target.value }))} />
               </label>
               <label className={styles.span2}>
+                Cover image URL
+                <input value={provinceForm.coverImageUrl} onChange={(event) => setProvinceForm((state) => ({ ...state, coverImageUrl: event.target.value }))} />
+              </label>
+              <label className={styles.span2}>
                 Fact
                 <textarea rows={2} required value={provinceForm.fact} onChange={(event) => setProvinceForm((state) => ({ ...state, fact: event.target.value }))} />
+              </label>
+              <label className={styles.span2}>
+                Attractions (one per line)
+                <textarea rows={2} value={provinceForm.attractions} onChange={(event) => setProvinceForm((state) => ({ ...state, attractions: event.target.value }))} />
+              </label>
+              <label className={styles.span2}>
+                Notable people (one per line)
+                <textarea rows={2} value={provinceForm.notablePeople} onChange={(event) => setProvinceForm((state) => ({ ...state, notablePeople: event.target.value }))} />
               </label>
               <div className={styles.buttonRow}>
                 <button className={styles.primary} type="submit" disabled={!selectedCountryId}>Add province</button>
@@ -504,8 +538,20 @@ export default function AdminCms() {
                 <input required value={localUnitForm.lng} onChange={(event) => setLocalUnitForm((state) => ({ ...state, lng: event.target.value }))} />
               </label>
               <label className={styles.span2}>
+                Cover image URL
+                <input value={localUnitForm.coverImageUrl} onChange={(event) => setLocalUnitForm((state) => ({ ...state, coverImageUrl: event.target.value }))} />
+              </label>
+              <label className={styles.span2}>
                 Fact
                 <textarea rows={2} required value={localUnitForm.fact} onChange={(event) => setLocalUnitForm((state) => ({ ...state, fact: event.target.value }))} />
+              </label>
+              <label className={styles.span2}>
+                Attractions (one per line)
+                <textarea rows={2} value={localUnitForm.attractions} onChange={(event) => setLocalUnitForm((state) => ({ ...state, attractions: event.target.value }))} />
+              </label>
+              <label className={styles.span2}>
+                Notable people (one per line)
+                <textarea rows={2} value={localUnitForm.notablePeople} onChange={(event) => setLocalUnitForm((state) => ({ ...state, notablePeople: event.target.value }))} />
               </label>
               <div className={styles.buttonRow}>
                 <button className={styles.primary} type="submit" disabled={!selectedProvinceId}>Add local unit</button>

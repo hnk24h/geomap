@@ -35,6 +35,9 @@ export async function GET(request: Request, context: { params: Promise<{ slug: s
       lat: true,
       lng: true,
       color: true,
+      coverImageUrl: true,
+      attractions: true,
+      notablePeople: true,
     },
   })
 

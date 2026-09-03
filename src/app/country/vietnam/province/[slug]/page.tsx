@@ -22,6 +22,9 @@ export default async function ProvincePage({ params }: { params: Promise<{ slug:
 			lat: item.lat,
 			lng: item.lng,
 			color: item.color,
+			coverImageUrl: item.coverImageUrl,
+			attractions: item.attractions,
+			notablePeople: item.notablePeople,
 		}))
 		: (districtSamples[slug] || genericDistricts).map((item) =>
 				districtSamples[slug] ? item : { ...item, lat: province.lat + item.lat, lng: province.lng + item.lng },
@@ -36,6 +39,18 @@ export default async function ProvincePage({ params }: { params: Promise<{ slug:
 			center={[province.lat, province.lng]}
 			zoom={11}
 			pieces={pieces}
+			regionContext={{
+				slug: province.slug,
+				name: province.name,
+				subtitle: province.subtitle,
+				fact: province.fact,
+				lat: province.lat,
+				lng: province.lng,
+				color: province.color,
+				coverImageUrl: province.coverImageUrl,
+				attractions: province.attractions,
+				notablePeople: province.notablePeople,
+			}}
 			parentHref="/country/vietnam"
 			provinceMode
 			focusSlug={province.slug}
